@@ -1,0 +1,122 @@
+
+/* Dashboard date filter */
+.dashboard-header-with-filter {
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.dashboard-date-filter {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.date-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.date-filter-field label {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.date-filter-field input {
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+}
+
+.dashboard-quick-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: -4px 0 18px;
+}
+
+.quick-filter-btn {
+  border: 1px solid #d8dee8;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #475569;
+  padding: 7px 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.quick-filter-btn:hover,
+.quick-filter-btn.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.quick-filter-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.active-date-range {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.dashboard-error-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-color: #fecaca;
+  background: #fff7f7;
+  color: #991b1b;
+}
+
+.dashboard-error-card .btn {
+  margin-left: auto;
+}
+
+@media (max-width: 900px) {
+  .dashboard-date-filter {
+    width: 100%;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+
+  .active-date-range {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+.currency-value {
+  font-size: 24px !important;
+  white-space: nowrap;
+}
+
+
+/* Trial leads section */
+.trial-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.trial-list-header h3 { margin: 0; }
+@media (max-width: 760px) {
+  .trial-list-header .filters-bar { width: 100%; }
+}
