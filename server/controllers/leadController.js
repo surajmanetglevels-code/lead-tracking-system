@@ -26,14 +26,17 @@ function mapMatchedLead(doc) {
 
     email: doc.email || "",
 
-    source:
-      doc.utmSource ||
-      doc.source ||
-      doc.excelSource ||
-      "Unknown",
+source:
+  doc.utmSource ||
+  doc.source ||
+  doc.excelSource ||
+  "Unknown",
 
-    captureSource:
-      doc.source || "",
+captureSource:
+  doc.utmSource ||
+  doc.source ||
+  doc.excelSource ||
+  "Unknown",
 
     campaign:
       doc.utmCampaign || "",

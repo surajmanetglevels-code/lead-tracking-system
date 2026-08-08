@@ -154,26 +154,23 @@ export default function LeadJourney() {
             value={lead.email}
           />
 
-          <Field
-            label="Source"
-            value={
-              lead.captureSource ||
-              lead.source
-            }
-          />
+<Field
+  label="Source"
+  value={
+    lead.utmSource ||
+    lead.source ||
+    lead.excelSource ||
+    "Unknown"
+  }
+/>
 
-          <Field
-            label="Campaign"
-            value={
-              lead.campaign ||
-              lead.utmCampaign
-            }
-          />
-
-          <Field
-            label="UTM Source"
-            value={lead.utmSource}
-          />
+<Field
+  label="Campaign"
+  value={
+    lead.campaign ||
+    lead.utmCampaign
+  }
+/>
 
           <Field
             label="UTM Medium"

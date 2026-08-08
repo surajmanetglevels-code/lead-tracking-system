@@ -40,6 +40,53 @@ function buildFilter(req) {
   return filter;
 }
 
+function cleanMatchedSourceExpression() {
+  return {
+    $let: {
+      vars: {
+        rawSource: {
+          $toLower: {
+            $trim: {
+              input: {
+                $convert: {
+                  input: {
+                    $ifNull: ["$utmSource", ""],
+                  },
+                  to: "string",
+                  onError: "",
+                  onNull: "",
+                },
+              },
+            },
+          },
+        },
+      },
+
+      in: {
+        $cond: [
+          {
+            $or: [
+              { $eq: ["$$rawSource", ""] },
+              { $eq: ["$$rawSource", "legacy"] },
+
+              {
+                $regexMatch: {
+                  input: "$$rawSource",
+                  regex: /^[0-9]+$/,
+                },
+              },
+            ],
+          },
+
+          "unknown",
+
+          "$$rawSource",
+        ],
+      },
+    },
+  };
+}
+
 /**
  * A genuine trial journey is a lead that:
  * - currently has the normalized stage "Trial Given", or
@@ -171,40 +218,61 @@ async function overview(req, res) {
 // GET /api/matched/analytics/by-utm-source
 async function byUtmSource(req, res) {
   try {
-    const filter =
-      buildFilter(req);
+    const filter = buildFilter(req);
 
-    const data =
-      await MatchedLead.aggregate([
-        {
-          $match: filter,
+    const data = await MatchedLead.aggregate([
+      {
+        $match: filter,
+      },
+
+      {
+        $project: {
+          source: cleanMatchedSourceExpression(),
         },
-        {
-          $group: {
-            _id: {
-              $ifNull: [
-                "$utmSource",
-                "Unknown",
-              ],
-            },
-            total: {
-              $sum: 1,
-            },
+      },
+
+      {
+        $group: {
+          _id: "$source",
+          total: {
+            $sum: 1,
           },
         },
-        {
-          $project: {
-            _id: 0,
-            utmSource: "$_id",
-            total: 1,
+      },
+
+      {
+        $project: {
+          _id: 0,
+
+          utmSource: {
+            $cond: [
+              {
+                $or: [
+                  {
+                    $eq: ["$_id", ""],
+                  },
+                  {
+                    $eq: ["$_id", null],
+                  },
+                ],
+              },
+
+              "unknown",
+
+              "$_id",
+            ],
           },
+
+          total: 1,
         },
-        {
-          $sort: {
-            total: -1,
-          },
+      },
+
+      {
+        $sort: {
+          total: -1,
         },
-      ]);
+      },
+    ]);
 
     return res.json(data);
   } catch (error) {
@@ -221,64 +289,61 @@ async function byUtmSource(req, res) {
 }
 
 // GET /api/matched/analytics/funnel
-async function funnelByUtmSource(
-  req,
-  res
-) {
+async function funnelByUtmSource(req, res) {
   try {
-    const filter =
-      buildFilter(req);
+    const filter = buildFilter(req);
 
-    const data =
-      await MatchedLead.aggregate([
-        {
-          $match: filter,
-        },
-        {
-          $group: {
-            _id: {
-              utmSource: {
-                $ifNull: [
-                  "$utmSource",
-                  "Unknown",
-                ],
-              },
-              stage:
-                "$excelStage",
-            },
-            count: {
-              $sum: 1,
-            },
-          },
-        },
-        {
-          $group: {
-            _id:
-              "$_id.utmSource",
+    const data = await MatchedLead.aggregate([
+      {
+        $match: filter,
+      },
 
-            stages: {
-              $push: {
-                status:
-                  "$_id.stage",
-                count:
-                  "$count",
-              },
+      {
+        $project: {
+          utmSource: cleanMatchedSourceExpression(),
+          stage: "$excelStage",
+        },
+      },
+
+      {
+        $group: {
+          _id: {
+            utmSource: "$utmSource",
+            stage: "$stage",
+          },
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+
+      {
+        $group: {
+          _id: "$_id.utmSource",
+
+          stages: {
+            $push: {
+              status: "$_id.stage",
+              count: "$count",
             },
           },
         },
-        {
-          $project: {
-            _id: 0,
-            utmSource: "$_id",
-            stages: 1,
-          },
+      },
+
+      {
+        $project: {
+          _id: 0,
+          utmSource: "$_id",
+          stages: 1,
         },
-        {
-          $sort: {
-            utmSource: 1,
-          },
+      },
+
+      {
+        $sort: {
+          utmSource: 1,
         },
-      ]);
+      },
+    ]);
 
     return res.json(data);
   } catch (error) {
